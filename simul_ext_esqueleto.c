@@ -7,7 +7,7 @@
 #define LONGITUD_COMANDO 100
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2);
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2 , EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos);
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombre);
@@ -73,11 +73,53 @@ int main()
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
-       //Comparamos la orden ejecutada con todos los casos de comandos posibles
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos) !=0);
+       
+         //...
+         // Escritura de metadatos en comandos rename, remove, copy     
+         Grabarinodosydirectorio(directorio,&ext_blq_inodos,fent);
+         GrabarByteMaps(&ext_bytemaps,fent);
+         GrabarSuperBloque(&ext_superblock,fent);
+         if (grabardatos)
+           GrabarDatos(memdatos,fent);
+         grabardatos = 0;
+         //Si el comando es salir se habrán escrito todos los metadatos
+         //faltan los datos y cerrar
+         if (strcmp(orden,"salir")==0){
+            GrabarDatos(memdatos,fent);
+            fclose(fent);
+            return 0;
+         }
+     }
+}
+//Función para comprobar que el comando introducido es distinto de cero
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos){
+   int numOrden= 0;
+   //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
+   char *token;
+   token = strtok(strcomando, " ");
+   strcpy(orden, token);
+   printf("Orden: %s\n", orden);
+
+   token = strtok(NULL, " ");
+   argumento1 = strtok(NULL, " ");
+   printf("Argumento 1: %s\n", argumento1);
+
+   token = strtok(NULL, " ");
+   argumento2 = strtok(NULL, " ");
+   printf("Argumento 2: %s\n", argumento2);
+
+   if(orden == NULL){
+      numOrden = 0;
+   }
+   else{
+      numOrden = 1;
+   }
+   return numOrden;
+
+//Comparamos la orden ejecutada con todos los casos de comandos posibles
 	     if (strcmp(orden,"dir")==0) {
             Directorio(directorio,&ext_blq_inodos);
-            continue;
             }
          else if(strcmp(orden,"info")==0){
 
@@ -103,37 +145,7 @@ int main()
          else{
             printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]");
          }
-         //...
-         // Escritura de metadatos en comandos rename, remove, copy     
-         Grabarinodosydirectorio(directorio,&ext_blq_inodos,fent);
-         GrabarByteMaps(&ext_bytemaps,fent);
-         GrabarSuperBloque(&ext_superblock,fent);
-         if (grabardatos)
-           GrabarDatos(memdatos,fent);
-         grabardatos = 0;
-         //Si el comando es salir se habrán escrito todos los metadatos
-         //faltan los datos y cerrar
-         if (strcmp(orden,"salir")==0){
-            GrabarDatos(memdatos,fent);
-            fclose(fent);
-            return 0;
-         }
-     }
-}
-//Función para comprobar que el comando introducido es distinto de cero
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
-   int numOrden= 0;
-   orden = strtok(strcomando, " ");
-   printf("Orden: %s\n", orden);
 
-   argumento1 = strtok(NULL, " ");
-   printf("Argumento 1: %s\n", argumento1);
-
-   argumento2 = strtok(NULL, " ");
-   printf("Argumento 2: %s\n", argumento2);
-
-   
-   return numOrden;
 }
 
 //Función para grabar los inodos y el directorio
