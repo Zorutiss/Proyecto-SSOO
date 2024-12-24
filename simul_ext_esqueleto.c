@@ -119,7 +119,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
 
 //Comparamos la orden ejecutada con todos los casos de comandos posibles
 	     if (strcmp(orden,"dir")==0) {
-            Directorio(directorio,&ext_blq_inodos);
+            Directorio(directorio,ext_blq_inodos);
             }
          else if(strcmp(orden,"info")==0){
 
