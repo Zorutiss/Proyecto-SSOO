@@ -14,7 +14,7 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombreantiguo, char *nombrenuevo);
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-             EXT_DATOS *memdatos, char *nombre)
+             EXT_DATOS *memdatos, char *nombre);
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            char *nombre,  FILE *fich);
@@ -46,9 +46,16 @@ int main()
      FILE *fent;
      
      // Lectura del fichero completo de una sola vez
-     ...
      
+     //Abrimos el fichero con la función fopen como lectura (r) de binario(b)
      fent = fopen("particion.bin","r+b");
+
+     //Imprimir un error y salir en caso de que el archivo no se
+     //abra correctamente
+     if(fent == NULL){
+      printf("Error al abrir el archivo: particion.bin");
+      exit(1);
+     }
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
      
