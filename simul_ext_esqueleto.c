@@ -18,8 +18,8 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombreantiguo, char *nombrenuevo);
 //HECHA, FALTA PULIRLA
-//int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-//             EXT_DATOS *memdatos, char *nombre);
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+             EXT_DATOS *memdatos, char *nombre);
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            char *nombre,  FILE *fich);
@@ -106,15 +106,27 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    token = strtok(strcomando, " ");
    strcpy(orden, token);
    printf("Orden: %s\n", orden);
+   
+   if(strcmp(orden, "rename")==0 ||strcmp(orden, "imprimir")==0 ||strcmp(orden, "remove")==0 ||strcmp(orden, "copy")==0){
+      token = strtok(NULL, " ");
+      //argumento1 = strtok(NULL, " ");
+      strcpy (argumento1, token);
+      printf("Argumento 1: %s\n", argumento1);
 
-   token = strtok(NULL, " ");
-   argumento1 = strtok(NULL, " ");
-   printf("Argumento 1: %s\n", argumento1);
+      if(strcmp(orden, "rename")==0 ||strcmp(orden, "copy")==0){
+         token = strtok(NULL, " ");
+         //argumento2 = strtok(NULL, " ");
+         strcpy (argumento2, token);
+         printf("Argumento 2: %s\n", argumento2);
 
-   token = strtok(NULL, " ");
-   argumento2 = strtok(NULL, " ");
-   printf("Argumento 2: %s\n", argumento2);
+      }
+   }
+   else{
+      printf("Error en la introducción de comandos\n");
+   }
 
+   
+   
 /*LISTA DE COMANDOS DISPONIBLES
 
    dir = 1
@@ -143,7 +155,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 4;
          }
          else if(strcmp(orden,"imprimir\n")==0){
-            //Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
+            Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
             numeroComando = 5;
          }
          else if(strcmp(orden,"remove\n")==0){
@@ -156,13 +168,13 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 8;
          }
          else{
-            printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]");
+            printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]\n");
          }
    return numeroComando;
 }
 //
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
-
+printf("Prueba");
 }
 
 //             FUNCIÓN PARA GRABAR LOS INODOS Y EL DIRECTORIO
@@ -175,7 +187,7 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
       printf("Prueba");
 }
 
-/*int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre){
 
    int i,j;
@@ -191,10 +203,10 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
          }
          j++;
       }while ((blnumber != NULL_BLOQUE) && (j<MAX_NUMS_BLOQUE_INODO));
-      printf("%s\n", datosfichero);
+      printf("%s\n", datosfichero->dato);
    }
    return -2; //No se encontró
-}*/
+}
 
 //             ESTA FUNCIÓN SIRVE PARA LISTAR POR PANTALLA TODOS LOS FICHEROS
 
@@ -211,4 +223,15 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
       }
       printf("\n");
    }
+}
+
+int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+              char *nombre){
+   int num=0;
+   for(int i=0;i<MAX_FICHEROS;i++){
+      if(strcmp(nombre, directorio[i].dir_nfich)==0){
+         num = i;
+      }
+   }
+   return num;
 }
