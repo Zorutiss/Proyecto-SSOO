@@ -27,8 +27,8 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
-//void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
-//void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
+void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
+void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main()
@@ -106,16 +106,14 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    token = strtok(strcomando, " ");
    strcpy(orden, token);
    printf("Orden: %s\n", orden);
-   
+   /*PRUEBA PARA SOLUCIONAR EL CRASHEO DEL PROGRAMA AL INTRODUCIR MAL LOS DATOS AL COMANDO
    if(strcmp(orden, "rename")==0 ||strcmp(orden, "imprimir")==0 ||strcmp(orden, "remove")==0 ||strcmp(orden, "copy")==0){
       token = strtok(NULL, " ");
-      //argumento1 = strtok(NULL, " ");
       strcpy (argumento1, token);
       printf("Argumento 1: %s\n", argumento1);
 
       if(strcmp(orden, "rename")==0 ||strcmp(orden, "copy")==0){
          token = strtok(NULL, " ");
-         //argumento2 = strtok(NULL, " ");
          strcpy (argumento2, token);
          printf("Argumento 2: %s\n", argumento2);
 
@@ -124,8 +122,14 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    else{
       printf("Error en la introducción de comandos\n");
    }
-
+   */
+   token = strtok(NULL, " ");
+   strcpy(argumento1, token);
+      printf("Argumento 1: %s\n", argumento1);
    
+   token = strtok(NULL, " ");
+   strcpy(argumento2, token);
+      printf("Argumento 2: %s\n", argumento2);
    
 /*LISTA DE COMANDOS DISPONIBLES
 
@@ -183,9 +187,6 @@ void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos
    printf("Prueba");
 }
 
-void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
-      printf("Prueba");
-}
 
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre){
@@ -234,4 +235,21 @@ int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
       }
    }
    return num;
+}
+
+//             ESTA FUNCIÓN SIRVE PARA GRABAR LOS DATOS
+
+void GrabarDatos(EXT_DATOS *memdatos, FILE *fich)
+{
+    fseek(fich, 4*SIZE_BLOQUE, SEEK_SET);
+    fwrite(memdatos, MAX_BLOQUES_DATOS, SIZE_BLOQUE, fich);
+}
+
+void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
+    fseek(fich, 4*SIZE_BLOQUE, SEEK_SET);
+    fwrite(ext_bytemaps, MAX_BLOQUES_DATOS, SIZE_BLOQUE, fich);
+}
+void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
+    fseek(fich, 4*SIZE_BLOQUE, SEEK_SET);
+    fwrite(ext_superblock, MAX_BLOQUES_DATOS, SIZE_BLOQUE, fich);
 }
