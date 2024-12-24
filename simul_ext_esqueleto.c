@@ -94,7 +94,7 @@ int main()
 }
 //Función para comprobar que el comando introducido es distinto de cero
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos){
-   int numOrden= 0;
+   int numeroComando= 0;
    //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
    char *token;
    token = strtok(strcomando, " ");
@@ -109,42 +109,52 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    argumento2 = strtok(NULL, " ");
    printf("Argumento 2: %s\n", argumento2);
 
-   if(orden == NULL){
-      numOrden = 0;
-   }
-   else{
-      numOrden = 1;
-   }
-   return numOrden;
+/*LISTA DE COMANDOS DISPONIBLES
 
+   dir = 1
+   info = 2
+   bytemaps = 3
+   rename = 4
+   imprimir = 5
+   remove = 6
+   copy = 7
+   salir = 8
+   comando erroneo = 0
+
+*/
 //Comparamos la orden ejecutada con todos los casos de comandos posibles
 	     if (strcmp(orden,"dir")==0) {
             Directorio(directorio,ext_blq_inodos);
+            numeroComando = 1;
             }
          else if(strcmp(orden,"info")==0){
-
+            numeroComando = 2;
          }
          else if(strcmp(orden,"bytemaps")==0){
-            
+            numeroComando = 3;
          }
          else if(strcmp(orden,"rename")==0){
-            
+            numeroComando = 4;
          }
          else if(strcmp(orden,"imprimir")==0){
-            
+            numeroComando = 5;
          }
          else if(strcmp(orden,"remove")==0){
-            
+            numeroComando = 6;
          }
          else if(strcmp(orden,"copy")==0){
-            
+            numeroComando = 7;
          }
          else if(strcmp(orden,"salir")==0){
-            
+            numeroComando = 8;
          }
          else{
             printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]");
          }
+   return numeroComando;
+}
+//
+void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
 
 }
 
@@ -157,3 +167,23 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
       printf("Prueba");
 }
 
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+             EXT_DATOS *memdatos, char *nombre){
+
+   int i,j;
+   unsigned int blnumber;
+   EXT_DATOS datosfichero[MAX_NUMS_BLOQUE_INODO]; //Tamaño máximo posible del fichero
+   i = BuscaFich(directorio, inodos, nombre);
+   if(i>0){
+      j = 0;
+      do{
+         blnumber = inodos -> blq_inodos[directorio[i].dir_inodo].i_nbloque[j];
+         if(blnumber != NULL_BLOQUE){
+            datosfichero[j] = memdatos[blnumber - PRIM_BLOQUE_DATOS];
+         }
+         j++;
+      }while ((blnumber != NULL_BLOQUE) && (j<MAX_NUMS_BLOQUE_INODO));
+      printf("%s\n", datosfichero);
+   }
+   return -2; //No ser encontró
+}
