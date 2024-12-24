@@ -74,10 +74,35 @@ int main()
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
 		 } while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
+       //Comparamos la orden ejecutada con todos los casos de comandos posibles
 	     if (strcmp(orden,"dir")==0) {
             Directorio(directorio,&ext_blq_inodos);
             continue;
             }
+         else if(strcmp(orden,"info")==0){
+
+         }
+         else if(strcmp(orden,"bytemaps")==0){
+            
+         }
+         else if(strcmp(orden,"rename")==0){
+            
+         }
+         else if(strcmp(orden,"imprimir")==0){
+            
+         }
+         else if(strcmp(orden,"remove")==0){
+            
+         }
+         else if(strcmp(orden,"copy")==0){
+            
+         }
+         else if(strcmp(orden,"salir")==0){
+            
+         }
+         else{
+            printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]");
+         }
          //...
          // Escritura de metadatos en comandos rename, remove, copy     
          Grabarinodosydirectorio(directorio,&ext_blq_inodos,fent);
@@ -97,8 +122,18 @@ int main()
 }
 //Función para comprobar que el comando introducido es distinto de cero
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
-   int prueba = 1;
-   return prueba;
+   int numOrden= 0;
+   orden = strtok(strcomando, " ");
+   printf("Orden: %s\n", orden);
+
+   argumento1 = strtok(NULL, " ");
+   printf("Argumento 1: %s\n", argumento1);
+
+   argumento2 = strtok(NULL, " ");
+   printf("Argumento 2: %s\n", argumento2);
+
+   
+   return numOrden;
 }
 
 //Función para grabar los inodos y el directorio
