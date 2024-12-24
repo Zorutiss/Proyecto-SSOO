@@ -8,7 +8,7 @@
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, char *nombre);
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos);
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
@@ -18,8 +18,8 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombreantiguo, char *nombrenuevo);
 //HECHA, FALTA PULIRLA
-int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-             EXT_DATOS *memdatos, char *nombre);
+//int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+//             EXT_DATOS *memdatos, char *nombre);
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            char *nombre,  FILE *fich);
@@ -27,8 +27,8 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
-void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
-void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
+//void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
+//void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main()
@@ -77,13 +77,13 @@ int main()
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos, nombre) !=0);
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos) !=8);
        
          //...
          // Escritura de metadatos en comandos rename, remove, copy     
          Grabarinodosydirectorio(directorio,&ext_blq_inodos,fent);
-         GrabarByteMaps(&ext_bytemaps,fent);
-         GrabarSuperBloque(&ext_superblock,fent);
+         //GrabarByteMaps(&ext_bytemaps,fent);
+         //GrabarSuperBloque(&ext_superblock,fent);
          if (grabardatos)
            GrabarDatos(memdatos,fent);
          grabardatos = 0;
@@ -99,7 +99,7 @@ int main()
 
 //             FUNCIÓN PARA COMPROBAR QUE EL COMANDO INTRODUCIDO ES DISTINTO DE CERO
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, char *nombre){
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos){
    int numeroComando= 0;
    //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
    char *token;
@@ -129,30 +129,30 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
 
 */
 //Comparamos la orden ejecutada con todos los casos de comandos posibles
-	     if (strcmp(orden,"dir")==0) {
+	     if (strcmp(orden,"dir\n")==0) {
             Directorio(directorio,ext_blq_inodos);
             numeroComando = 1;
             }
-         else if(strcmp(orden,"info")==0){
+         else if(strcmp(orden,"info\n")==0){
             numeroComando = 2;
          }
-         else if(strcmp(orden,"bytemaps")==0){
+         else if(strcmp(orden,"bytemaps\n")==0){
             numeroComando = 3;
          }
-         else if(strcmp(orden,"rename")==0){
+         else if(strcmp(orden,"rename\n")==0){
             numeroComando = 4;
          }
-         else if(strcmp(orden,"imprimir")==0){
-            Imprimir(directorio, inodos, memdatos, nombre);
+         else if(strcmp(orden,"imprimir\n")==0){
+            //Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
             numeroComando = 5;
          }
-         else if(strcmp(orden,"remove")==0){
+         else if(strcmp(orden,"remove\n")==0){
             numeroComando = 6;
          }
-         else if(strcmp(orden,"copy")==0){
+         else if(strcmp(orden,"copy\n")==0){
             numeroComando = 7;
          }
-         else if(strcmp(orden,"salir")==0){
+         else if(strcmp(orden,"salir\n")==0){
             numeroComando = 8;
          }
          else{
@@ -175,7 +175,7 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
       printf("Prueba");
 }
 
-int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
+/*int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre){
 
    int i,j;
@@ -193,8 +193,8 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
       }while ((blnumber != NULL_BLOQUE) && (j<MAX_NUMS_BLOQUE_INODO));
       printf("%s\n", datosfichero);
    }
-   return -2; //No ser encontró
-}
+   return -2; //No se encontró
+}*/
 
 //             ESTA FUNCIÓN SIRVE PARA LISTAR POR PANTALLA TODOS LOS FICHEROS
 
@@ -202,12 +202,12 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
 //Empezamos en 1 en vez de en cero ya que el enunciado pide que
 // la entrada especial del directorio raíz no se muestre.
    for(int i=0;i<MAX_FICHEROS;i++){
-      printf("Nombre     ", directorio[i].dir_nfich);
-      printf("tamanio: %i     ", );
+      printf("%s     ", directorio[i].dir_nfich);
+      printf("tamanio: %i     ", inodos->blq_inodos[directorio[i].dir_inodo].size_fichero);
       printf("inodo: %i     ", directorio[i].dir_inodo);
       printf("bloques: ");
       for(int j=0;j<MAX_NUMS_BLOQUE_INODO;j++){
-         printf(" %i", inodos[j].blq_inodos);
+         printf(" %i", inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]);
       }
       printf("\n");
    }
