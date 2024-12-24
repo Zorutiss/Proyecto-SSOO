@@ -7,14 +7,17 @@
 #define LONGITUD_COMANDO 100
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2 , EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos);
+
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, char *nombre);
+
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombre);
+//CASI HECHA              
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombreantiguo, char *nombrenuevo);
-//HECHA
+//HECHA, FALTA PULIRLA
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre);
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
@@ -74,7 +77,7 @@ int main()
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos) !=0);
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos, nombre) !=0);
        
          //...
          // Escritura de metadatos en comandos rename, remove, copy     
@@ -93,8 +96,10 @@ int main()
          }
      }
 }
-//Función para comprobar que el comando introducido es distinto de cero
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos){
+
+//             FUNCIÓN PARA COMPROBAR QUE EL COMANDO INTRODUCIDO ES DISTINTO DE CERO
+
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, char *nombre){
    int numeroComando= 0;
    //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
    char *token;
@@ -160,7 +165,8 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
 
 }
 
-//Función para grabar los inodos y el directorio
+//             FUNCIÓN PARA GRABAR LOS INODOS Y EL DIRECTORIO
+
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
    printf("Prueba");
 }
@@ -188,4 +194,21 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
       printf("%s\n", datosfichero);
    }
    return -2; //No ser encontró
+}
+
+//             ESTA FUNCIÓN SIRVE PARA LISTAR POR PANTALLA TODOS LOS FICHEROS
+
+void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
+//Empezamos en 1 en vez de en cero ya que el enunciado pide que
+// la entrada especial del directorio raíz no se muestre.
+   for(int i=0;i<MAX_FICHEROS;i++){
+      printf("Nombre     ", directorio[i].dir_nfich);
+      printf("tamanio: %i     ", );
+      printf("inodo: %i     ", directorio[i].dir_inodo);
+      printf("bloques: ");
+      for(int j=0;j<MAX_NUMS_BLOQUE_INODO;j++){
+         printf(" %i", inodos[j].blq_inodos);
+      }
+      printf("\n");
+   }
 }
