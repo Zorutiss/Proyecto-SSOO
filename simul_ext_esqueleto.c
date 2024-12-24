@@ -14,6 +14,7 @@ int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombreantiguo, char *nombrenuevo);
+//HECHA
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre);
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
@@ -59,7 +60,7 @@ int main()
      }
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
-     /*
+     /*POR TERMINAR
      memcpy(&ext_superblock,(EXT_SIMPLE_SUPERBLOCK *)&datosfich[0], SIZE_BLOQUE);
      memcpy(&directorio,(EXT_ENTRADA_DIR *)&datosfich[3], SIZE_BLOQUE);
      memcpy(&ext_bytemaps,(EXT_BLQ_INODOS *)&datosfich[1], SIZE_BLOQUE);
@@ -137,6 +138,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 4;
          }
          else if(strcmp(orden,"imprimir")==0){
+            Imprimir(directorio, inodos, memdatos, nombre);
             numeroComando = 5;
          }
          else if(strcmp(orden,"remove")==0){
