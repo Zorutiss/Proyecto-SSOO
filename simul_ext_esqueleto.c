@@ -84,12 +84,12 @@ int main()
          GrabarByteMaps(&ext_bytemaps,fent);
          GrabarSuperBloque(&ext_superblock,fent);
          if (grabardatos)
-           GrabarDatos(&memdatos,fent);
+           GrabarDatos(memdatos,fent);
          grabardatos = 0;
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
          if (strcmp(orden,"salir")==0){
-            GrabarDatos(&memdatos,fent);
+            GrabarDatos(memdatos,fent);
             fclose(fent);
             return 0;
          }
