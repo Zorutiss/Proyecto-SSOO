@@ -2,6 +2,7 @@
 #include<string.h>
 #include<ctype.h>
 #include "cabeceras.h"
+#include <stdlib.h>
 
 #define LONGITUD_COMANDO 100
 
@@ -71,12 +72,13 @@ int main()
 		 printf (">> ");
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
+
 		 } while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
 	     if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
             continue;
             }
-         ...
+         //...
          // Escritura de metadatos en comandos rename, remove, copy     
          Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
          GrabarByteMaps(&ext_bytemaps,fent);
@@ -93,3 +95,9 @@ int main()
          }
      }
 }
+//Función para comprobar que el comando introducido es distinto de cero
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
+   int prueba = 1;
+   return prueba;
+}
+
