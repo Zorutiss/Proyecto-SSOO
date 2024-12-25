@@ -292,3 +292,35 @@ void Printbytemaps(EXT_BYTE_MAPS *bytemaps) {
     }
     printf("\n");
 }
+
+#include <string.h>
+#include <stdio.h>
+
+void RenameFile(EXT_ENTRADA_DIR *directorio, const char *nombre_actual, const char *nombre_nuevo) {
+    int encontrado = 0;
+
+    // Buscar el archivo con el nombre actual
+    for (int i = 0; i < 20; i++) {
+        if (strcmp(directorio[i].dir_nfich, nombre_actual) == 0) {
+            encontrado = 1;
+
+            // Verificar si el nuevo nombre ya existe
+            for (int j = 0; j < 20; j++) {
+                if (strcmp(directorio[j].dir_nfich, nombre_nuevo) == 0) {
+                    printf("Error: El nuevo nombre ya existe.\n");
+                    return;
+                }
+            }
+
+            // Renombrar el archivo
+            strncpy(directorio[i].dir_nfich, nombre_nuevo, sizeof(directorio[i].dir_nfich) - 1);
+            directorio[i].dir_nfich[sizeof(directorio[i].dir_nfich) - 1] = '\0'; // Asegurar terminación
+            printf("Archivo renombrado exitosamente.\n");
+            return;
+        }
+    }
+
+    if (!encontrado) {
+        printf("Error: Archivo con el nombre actual no encontrado.\n");
+    }
+}
