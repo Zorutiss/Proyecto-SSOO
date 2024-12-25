@@ -293,9 +293,6 @@ void Printbytemaps(EXT_BYTE_MAPS *bytemaps) {
     printf("\n");
 }
 
-#include <string.h>
-#include <stdio.h>
-
 void RenameFile(EXT_ENTRADA_DIR *directorio, const char *nombre_actual, const char *nombre_nuevo) {
     int encontrado = 0;
 
@@ -323,4 +320,33 @@ void RenameFile(EXT_ENTRADA_DIR *directorio, const char *nombre_actual, const ch
     if (!encontrado) {
         printf("Error: Archivo con el nombre actual no encontrado.\n");
     }
+}
+
+void RemoveFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_archivo) {
+    for (int i = 0; i < 20; i++) {
+        if (strcmp(directorio[i].dir_nfich, nombre_archivo) == 0) {
+            unsigned short int inodo_num = directorio[i].dir_inodo;
+
+            // Liberar los bloques asignados al inodo
+            for (int j = 0; j < 7; j++) {
+                if (inodos[inodo_num].i_nbloque[j] != 0xFFFF) {
+                    bmap_bloques[inodos[inodo_num].i_nbloque[j]] = 0;
+                    inodos[inodo_num].i_nbloque[j] = 0xFFFF;
+                }
+            }
+
+            // Marcar el inodo como libre
+            bmap_inodos[inodo_num] = 0;
+            inodos[inodo_num].size_fichero = 0;
+
+            // Eliminar la entrada del directorio
+            directorio[i].dir_nfich[0] = '\0';
+            directorio[i].dir_inodo = 0xFFFF;
+
+            printf("Archivo eliminado exitosamente.\n");
+            return;
+        }
+    }
+
+    printf("Error: Archivo no encontrado.\n");
 }
