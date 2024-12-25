@@ -350,3 +350,73 @@ void RemoveFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned 
 
     printf("Error: Archivo no encontrado.\n");
 }
+
+void CopyFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_origen, const char *nombre_destino) {
+    int origen_idx = -1, destino_idx = -1;
+
+    // Buscar el archivo origen
+    for (int i = 0; i < 20; i++) {
+        if (strcmp(directorio[i].dir_nfich, nombre_origen) == 0) {
+            origen_idx = i;
+            break;
+        }
+    }
+    if (origen_idx == -1) {
+        printf("Error: Archivo origen no encontrado.\n");
+        return;
+    }
+
+    // Verificar si el destino ya existe
+    for (int i = 0; i < 20; i++) {
+        if (strcmp(directorio[i].dir_nfich, nombre_destino) == 0) {
+            printf("Error: Archivo destino ya existe.\n");
+            return;
+        }
+        if (directorio[i].dir_nfich[0] == '\0' && destino_idx == -1) {
+            destino_idx = i; // Guardar la primera entrada vacía
+        }
+    }
+    if (destino_idx == -1) {
+        printf("Error: No hay espacio en el directorio para la copia.\n");
+        return;
+    }
+
+    // Buscar el primer inodo libre
+    int inodo_libre = -1;
+    for (int i = 0; i < MAX_INODOS; i++) {
+        if (bmap_inodos[i] == 0) {
+            inodo_libre = i;
+            break;
+        }
+    }
+    if (inodo_libre == -1) {
+        printf("Error: No hay inodos disponibles.\n");
+        return;
+    }
+
+    // Copiar contenido del archivo
+    EXT_SIMPLE_INODE *inodo_origen = &inodos[directorio[origen_idx].dir_inodo];
+    EXT_SIMPLE_INODE *inodo_destino = &inodos[inodo_libre];
+    *inodo_destino = *inodo_origen;
+
+    // Asignar nuevos bloques para la copia
+    for (int i = 0; i < 7 && inodo_origen->i_nbloque[i] != 0xFFFF; i++) {
+        for (int j = 0; j < MAX_BLOQUES_PARTICION; j++) {
+            if (bmap_bloques[j] == 0) {
+                bmap_bloques[j] = 1;
+                inodo_destino->i_nbloque[i] = j;
+                break;
+            }
+        }
+    }
+
+    // Marcar el inodo como ocupado
+    bmap_inodos[inodo_libre] = 1;
+
+    // Crear la entrada en el directorio
+    strncpy(directorio[destino_idx].dir_nfich, nombre_destino, sizeof(directorio[destino_idx].dir_nfich) - 1);
+    directorio[destino_idx].dir_nfich[sizeof(directorio[destino_idx].dir_nfich) - 1] = '\0';
+    directorio[destino_idx].dir_inodo = inodo_libre;
+
+    printf("Archivo copiado exitosamente.\n");
+}
