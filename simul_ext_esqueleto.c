@@ -178,13 +178,34 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
 }
 //
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
-printf("Prueba");
+    // Mostrar la información del superbloque
+    printf("Superbloque:\n");
+    printf("  Número total de inodos: %u\n", psup->s_inodes_count);
+    printf("  Número total de bloques: %u\n", psup->s_blocks_count);
+    printf("  Bloques libres: %u\n", psup->s_free_blocks_count);
+    printf("  Inodos libres: %u\n", psup->s_free_inodes_count);
+    printf("  Primer bloque de datos: %u\n", psup->s_first_data_block);
+    printf("  Tamaño del bloque: %u bytes\n", psup->s_block_size);
 }
 
 //             FUNCIÓN PARA GRABAR LOS INODOS Y EL DIRECTORIO
 
-void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
-   printf("Prueba");
+void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich) {
+    // Posicionarse en el archivo para escribir el bloque de inodos
+    fseek(fich, 512 * 3, SEEK_SET); // Bloque 3: Lista de inodos
+    if (fwrite(inodos, sizeof(EXT_BLQ_INODOS), 1, fich) != 1) {
+        perror("Error al escribir la lista de inodos");
+        return;
+    }
+
+    // Posicionarse para escribir el bloque del directorio
+    fseek(fich, 512 * 4, SEEK_SET); // Bloque 4: Directorio
+    if (fwrite(directorio, 20 * sizeof(EXT_ENTRADA_DIR), 1, fich) != 1) {
+        perror("Error al escribir el directorio");
+        return;
+    }
+
+    printf("Inodos y directorio grabados correctamente en el archivo.\n");
 }
 
 
