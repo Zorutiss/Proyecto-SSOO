@@ -274,3 +274,21 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
     fseek(fich, 4*SIZE_BLOQUE, SEEK_SET);
     fwrite(ext_superblock, MAX_BLOQUES_DATOS, SIZE_BLOQUE, fich);
 }
+
+void Printbytemaps(EXT_BYTE_MAPS *bytemaps) {
+    printf("Bytemaps:\n");
+
+    // Mostrar los primeros 25 elementos del bytemap de bloques
+    printf("  Bytemap de bloques:\n  ");
+    for (int i = 0; i < 25; i++) {
+        printf("%d ", bytemaps->bmap_bloques[i]);
+    }
+    printf("\n");
+
+    // Mostrar el contenido del bytemap de inodos
+    printf("  Bytemap de inodos:\n  ");
+    for (int i = 0; i < MAX_INODOS; i++) {
+        printf("%d ", bytemaps->bmap_inodos[i]);
+    }
+    printf("\n");
+}
