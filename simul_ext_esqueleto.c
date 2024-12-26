@@ -123,14 +123,14 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
       printf("Error en la introducción de comandos\n");
    }
    */
-   token = strtok(NULL, " ");
+   /*token = strtok(NULL, " ");
    strcpy(argumento1, token);
       printf("Argumento 1: %s\n", argumento1);
    
    token = strtok(NULL, " ");
    strcpy(argumento2, token);
       printf("Argumento 2: %s\n", argumento2);
-   
+   */
 /*LISTA DE COMANDOS DISPONIBLES
 
    dir = 1
@@ -150,6 +150,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 1;
             }
          else if(strcmp(orden,"info\n")==0){
+            LeeSuperBloque(ext_superblock);
             numeroComando = 2;
          }
          else if(strcmp(orden,"bytemaps\n")==0){
@@ -166,6 +167,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 6;
          }
          else if(strcmp(orden,"copy\n")==0){
+            //CopyFile(directorio;
             numeroComando = 7;
          }
          else if(strcmp(orden,"salir\n")==0){
