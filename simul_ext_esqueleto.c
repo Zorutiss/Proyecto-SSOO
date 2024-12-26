@@ -8,7 +8,7 @@
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos);
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, EXT_SIMPLE_SUPERBLOCK *psup, EXT_BYTE_MAPS *ext_bytemaps);
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
@@ -63,13 +63,13 @@ int main()
      }
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
-     /*POR TERMINAR
+     
      memcpy(&ext_superblock,(EXT_SIMPLE_SUPERBLOCK *)&datosfich[0], SIZE_BLOQUE);
      memcpy(&directorio,(EXT_ENTRADA_DIR *)&datosfich[3], SIZE_BLOQUE);
      memcpy(&ext_bytemaps,(EXT_BLQ_INODOS *)&datosfich[1], SIZE_BLOQUE);
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
-     */
+     
      // Buce de tratamiento de comandos
      for (;;){
 		 do {
@@ -77,7 +77,7 @@ int main()
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos) !=8);
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos, &ext_superblock, &ext_bytemaps) !=8);
        
          //...
          // Escritura de metadatos en comandos rename, remove, copy     
@@ -99,7 +99,7 @@ int main()
 
 //             FUNCIÓN PARA COMPROBAR QUE EL COMANDO INTRODUCIDO ES DISTINTO DE CERO
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos){
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, EXT_SIMPLE_SUPERBLOCK *psup, EXT_BYTE_MAPS *ext_bytemaps){
    int numeroComando= 0;
    //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
    char *token;
@@ -150,10 +150,11 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 1;
             }
          else if(strcmp(orden,"info\n")==0){
-            LeeSuperBloque(ext_superblock);
+            LeeSuperBloque(psup);
             numeroComando = 2;
          }
          else if(strcmp(orden,"bytemaps\n")==0){
+            Printbytemaps(ext_bytemaps);
             numeroComando = 3;
          }
          else if(strcmp(orden,"rename\n")==0){
@@ -237,7 +238,7 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
 //Empezamos en 1 en vez de en cero ya que el enunciado pide que
 // la entrada especial del directorio raíz no se muestre.
-   for(int i=0;i<MAX_FICHEROS;i++){
+   for(int i=1;i<MAX_FICHEROS;i++){
       printf("%s     ", directorio[i].dir_nfich);
       printf("tamanio: %i     ", inodos->blq_inodos[directorio[i].dir_inodo].size_fichero);
       printf("inodo: %i     ", directorio[i].dir_inodo);
