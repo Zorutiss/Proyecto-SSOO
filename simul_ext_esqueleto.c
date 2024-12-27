@@ -30,6 +30,7 @@ void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos
 void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
 void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
+void RenameFile(EXT_ENTRADA_DIR *directorio, const char *nombre_actual, const char *nombre_nuevo);
 
 int main()
 {
@@ -93,6 +94,7 @@ int main()
             GrabarDatos(memdatos,fent);
             fclose(fent);
             return 0;
+
          }
      }
 }
@@ -106,31 +108,19 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    token = strtok(strcomando, " ");
    strcpy(orden, token);
    printf("Orden: %s\n", orden);
-   /*PRUEBA PARA SOLUCIONAR EL CRASHEO DEL PROGRAMA AL INTRODUCIR MAL LOS DATOS AL COMANDO
-   if(strcmp(orden, "rename")==0 ||strcmp(orden, "imprimir")==0 ||strcmp(orden, "remove")==0 ||strcmp(orden, "copy")==0){
-      token = strtok(NULL, " ");
-      strcpy (argumento1, token);
-      printf("Argumento 1: %s\n", argumento1);
-
-      if(strcmp(orden, "rename")==0 ||strcmp(orden, "copy")==0){
-         token = strtok(NULL, " ");
-         strcpy (argumento2, token);
-         printf("Argumento 2: %s\n", argumento2);
-
-      }
-   }
-   else{
-      printf("Error en la introducción de comandos\n");
-   }
-   */
-   /*token = strtok(NULL, " ");
-   strcpy(argumento1, token);
-      printf("Argumento 1: %s\n", argumento1);
    
+
    token = strtok(NULL, " ");
-   strcpy(argumento2, token);
-      printf("Argumento 2: %s\n", argumento2);
-   */
+
+  if(token!=NULL){
+    strcpy(argumento1, token);
+    printf("Argumento 1: %s\n", argumento1);
+    token = strtok(NULL, " ");
+    if(token!=NULL){
+        strcpy(argumento2, token);
+        printf("Argumento 2: %s\n", argumento2);
+    }
+  }
 /*LISTA DE COMANDOS DISPONIBLES
 
    dir = 1
@@ -157,17 +147,18 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             Printbytemaps(ext_bytemaps);
             numeroComando = 3;
          }
-         else if(strcmp(orden,"rename\n")==0){
+         else if(strcmp(orden,"rename")==0){
+            RenameFile(directorio, argumento1, argumento2);
             numeroComando = 4;
          }
          else if(strcmp(orden,"imprimir\n")==0){
             Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
             numeroComando = 5;
          }
-         else if(strcmp(orden,"remove\n")==0){
+         else if(strcmp(orden,"remove")==0){
             numeroComando = 6;
          }
-         else if(strcmp(orden,"copy\n")==0){
+         else if(strcmp(orden,"copy")==0){
             //CopyFile(directorio;
             numeroComando = 7;
          }
@@ -239,14 +230,19 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
 //Empezamos en 1 en vez de en cero ya que el enunciado pide que
 // la entrada especial del directorio raíz no se muestre.
    for(int i=1;i<MAX_FICHEROS;i++){
+    if(directorio[i].dir_inodo!=NULL_INODO){
       printf("%s     ", directorio[i].dir_nfich);
       printf("tamanio: %i     ", inodos->blq_inodos[directorio[i].dir_inodo].size_fichero);
       printf("inodo: %i     ", directorio[i].dir_inodo);
       printf("bloques: ");
+    
       for(int j=0;j<MAX_NUMS_BLOQUE_INODO;j++){
+        if(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]!=NULL_BLOQUE)
          printf(" %i", inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]);
       }
+    
       printf("\n");
+    }
    }
 }
 
