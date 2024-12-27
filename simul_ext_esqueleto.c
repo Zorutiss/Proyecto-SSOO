@@ -150,7 +150,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             RenameFile(directorio, argumento1, argumento2);
             numeroComando = 4;
          }
-         else if(strcmp(orden,"imprimir\n")==0){
+         else if(strcmp(orden,"imprimir")==0){
             Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
             numeroComando = 5;
          }
@@ -202,27 +202,30 @@ void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos
 }
 
 
-int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-             EXT_DATOS *memdatos, char *nombre){
-
-   int i,j;
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,EXT_DATOS *memdatos, char *nombre){   
+    int i,j;
    unsigned int blnumber;
-  //EXT_DATOS datosfichero[MAX_NUMS_BLOQUE_INODO]; //Tamaño máximo posible del fichero
-   i = BuscaFich(directorio, inodos, nombre);
-   if(i>0){
-      j = 0;
+   //EXT_DATOS datosFichero[MAX_NUMS_BLOQUE_INODO];
+   i= BuscaFich(directorio,inodos,nombre);
+   if(i==-1){
+      printf("No se encontro el archivo\n");
+   }
+    if(i>0){
+      j=0;
       do{
-         blnumber = inodos -> blq_inodos[directorio[i].dir_inodo].i_nbloque[j];
-         if(blnumber != NULL_BLOQUE){
-            //datosfichero[j] = memdatos[blnumber - PRIM_BLOQUE_DATOS];
-            printf(" %s", memdatos[blnumber - PRIM_BLOQUE_DATOS].dato);
+         blnumber= inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j];
+         if(blnumber!= NULL_BLOQUE){
+            //datosFichero[j]=memdatos[blnumber-PRIM_BLOQUE_DATOS];
+            printf("%s ",memdatos[blnumber-PRIM_BLOQUE_DATOS].dato);
+            j++;
          }
-         j++;
-      }while ((blnumber != NULL_BLOQUE) && (j<MAX_NUMS_BLOQUE_INODO));
+
+      }while((blnumber!= NULL_BLOQUE)&& (j<MAX_NUMS_BLOQUE_INODO));
       printf("\n");
    }
-   return -2; //No se encontró
+   return -1;
 }
+
 
 //             ESTA FUNCIÓN SIRVE PARA LISTAR POR PANTALLA TODOS LOS FICHEROS
 
