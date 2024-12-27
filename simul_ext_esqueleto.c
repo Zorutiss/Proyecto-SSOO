@@ -8,7 +8,15 @@
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, EXT_SIMPLE_SUPERBLOCK *psup, EXT_BYTE_MAPS *ext_bytemaps);
+int ComprobarComando(char *strcomando, char *orden, 
+                     char *argumento1, char *argumento2,
+                     EXT_ENTRADA_DIR *directorio, 
+                     EXT_BLQ_INODOS *ext_blq_inodos, 
+                     EXT_DATOS *memdatos, 
+                     EXT_SIMPLE_SUPERBLOCK *psup,
+                     EXT_BYTE_MAPS *ext_bytemaps,
+                     unsigned char *bmap_inodos, 
+                     unsigned char *bmap_bloques);
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
@@ -99,7 +107,15 @@ int main()
 
 //             FUNCIÓN PARA COMPROBAR QUE EL COMANDO INTRODUCIDO ES DISTINTO DE CERO
 
-int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2, EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *ext_blq_inodos, EXT_DATOS *memdatos, EXT_SIMPLE_SUPERBLOCK *psup, EXT_BYTE_MAPS *ext_bytemaps){
+int ComprobarComando(char *strcomando, char *orden, 
+                     char *argumento1, char *argumento2,
+                     EXT_ENTRADA_DIR *directorio, 
+                     EXT_BLQ_INODOS *ext_blq_inodos, 
+                     EXT_DATOS *memdatos, 
+                     EXT_SIMPLE_SUPERBLOCK *psup,
+                     EXT_BYTE_MAPS *ext_bytemaps,
+                     unsigned char *bmap_inodos, 
+                     unsigned char *bmap_bloques){
    int numeroComando= 0;
    //Creamos un token con el que dividiremos el comando en orden, argumento1 y argumento2
    char *token;
@@ -107,20 +123,18 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    strcpy(orden, token);
    printf("Orden: %s\n", orden);
    
-
    token = strtok(NULL, " ");
-
   if(token!=NULL){
     strcpy(argumento1, token);
     printf("Argumento 1: %s\n", argumento1);
     token = strtok(NULL, " ");
+
     if(token!=NULL){
         strcpy(argumento2, token);
         printf("Argumento 2: %s\n", argumento2);
     }
   }
 /*LISTA DE COMANDOS DISPONIBLES
-
    dir = 1
    info = 2
    bytemaps = 3
@@ -130,7 +144,6 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    copy = 7
    salir = 8
    comando erroneo = 0
-
 */
 //Comparamos la orden ejecutada con todos los casos de comandos posibles
 	     if (strcmp(orden,"dir\n")==0) {
@@ -154,10 +167,11 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
             numeroComando = 5;
          }
          else if(strcmp(orden,"remove")==0){
+            RemoveFile(directorio, ext_blq_inodos, bmap_inodos, bmap_bloques, argumento1);
             numeroComando = 6;
          }
          else if(strcmp(orden,"copy")==0){
-            //CopyFile(directorio;
+            CopyFile(directorio, ext_blq_inodos, bmap_inodos, bmap_bloques, argumento1, argumento2);
             numeroComando = 7;
          }
          else if(strcmp(orden,"salir\n")==0){
@@ -170,7 +184,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
 }
 //
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
-    // Mostrar la información del superbloque
+    // Muestra la información del superbloque
     printf("Superbloque:\n");
     printf("  Número total de inodos: %u\n", psup->s_inodes_count);
     printf("  Número total de bloques: %u\n", psup->s_blocks_count);
