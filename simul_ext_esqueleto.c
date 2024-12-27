@@ -71,7 +71,6 @@ int main()
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
      // Buce de tratamiento de comandos
-     for (;;){
 		 do {
 		 printf (">> ");
 		 fflush(stdin);
@@ -95,7 +94,7 @@ int main()
             return 0;
 
          }
-     }
+     
 }
 
 //             FUNCIÓN PARA COMPROBAR QUE EL COMANDO INTRODUCIDO ES DISTINTO DE CERO
@@ -251,7 +250,8 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
 
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
               char *nombre){
-   int num=0;
+                
+   int num=-1;
    for(int i=0;i<MAX_FICHEROS;i++){
       if(strcmp(nombre, directorio[i].dir_nfich)==0){
          num = i;
