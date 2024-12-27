@@ -207,18 +207,19 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
 
    int i,j;
    unsigned int blnumber;
-   EXT_DATOS datosfichero[MAX_NUMS_BLOQUE_INODO]; //Tamaño máximo posible del fichero
+  //EXT_DATOS datosfichero[MAX_NUMS_BLOQUE_INODO]; //Tamaño máximo posible del fichero
    i = BuscaFich(directorio, inodos, nombre);
    if(i>0){
       j = 0;
       do{
          blnumber = inodos -> blq_inodos[directorio[i].dir_inodo].i_nbloque[j];
          if(blnumber != NULL_BLOQUE){
-            datosfichero[j] = memdatos[blnumber - PRIM_BLOQUE_DATOS];
+            //datosfichero[j] = memdatos[blnumber - PRIM_BLOQUE_DATOS];
+            printf(" %s", memdatos[blnumber - PRIM_BLOQUE_DATOS].dato);
          }
          j++;
       }while ((blnumber != NULL_BLOQUE) && (j<MAX_NUMS_BLOQUE_INODO));
-      printf("%s\n", datosfichero->dato);
+      printf("\n");
    }
    return -2; //No se encontró
 }
