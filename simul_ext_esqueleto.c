@@ -167,18 +167,15 @@ int ComprobarComando(char *strcomando, char *orden,
             numeroComando = 5;
          }
          else if (strcmp(orden, "remove") == 0) {
-            RemoveFile(directorio, ext_blq_inodos, ext_bytemaps, psup, argumento1, fent);
+            RemoveFile(directorio, ext_blq_inodos, ext_bytemaps, psup, argumento1);
             numeroComando = 6;
          }
          else if (strcmp(orden, "copy") == 0) {
-            CopyFile(directorio, ext_blq_inodos, ext_bytemaps, psup, memdatos, argumento1, argumento2, fent);
+            CopyFile(directorio, ext_blq_inodos, ext_bytemaps, psup, memdatos, argumento1, argumento2);
             numeroComando = 7;
          }
          else if (strcmp(orden, "salir\n") == 0) {
-            if (grabardatos) {
-                GrabarDatos(memdatos, fent);
-                grabardatos = 0;
-            } 
+            GrabarDatos(memdatos, fent);
             fclose(fent);
             numeroComando = 8;
         }
