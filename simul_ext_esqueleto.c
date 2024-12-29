@@ -175,8 +175,6 @@ int ComprobarComando(char *strcomando, char *orden,
             numeroComando = 7;
          }
          else if (strcmp(orden, "salir\n") == 0) {
-            GrabarDatos(memdatos, fent);
-            fclose(fent);
             numeroComando = 8;
         }
          else{
