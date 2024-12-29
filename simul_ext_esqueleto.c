@@ -27,12 +27,20 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
 
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
              EXT_DATOS *memdatos, char *nombre);
-int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
-           EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
-           char *nombre,  FILE *fich);
+//int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
+//           EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
+//           char *nombre,  FILE *fich);
+
+void Borrar(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos,
+                 unsigned char *bmap_inodos, unsigned char *bmap_bloques,
+                  const char *nombre_archivo);
+
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
+//int Copiar(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, 
+//            unsigned char *bmap_inodos, unsigned char *bmap_bloques, 
+//            const char *nombre_origen, const char *nombre_destino);
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
 void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
 void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
@@ -57,6 +65,10 @@ int main()
      int entradadir;
      int grabardatos;
      FILE *fent;
+
+    //PRUEBA
+     unsigned char *bmap_inodos;
+     unsigned char *bmap_bloques;
      
      // Lectura del fichero completo de una sola vez
      
@@ -84,7 +96,7 @@ int main()
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos, &ext_superblock, &ext_bytemaps) !=8);
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2, directorio, &ext_blq_inodos, memdatos, &ext_superblock, &ext_bytemaps, bmap_inodos, bmap_bloques) !=8);
        
          //...
          // Escritura de metadatos en comandos rename, remove, copy     
@@ -121,17 +133,14 @@ int ComprobarComando(char *strcomando, char *orden,
    char *token;
    token = strtok(strcomando, " ");
    strcpy(orden, token);
-   printf("Orden: %s\n", orden);
    
    token = strtok(NULL, " ");
   if(token!=NULL){
     strcpy(argumento1, token);
-    printf("Argumento 1: %s\n", argumento1);
     token = strtok(NULL, " ");
 
     if(token!=NULL){
         strcpy(argumento2, token);
-        printf("Argumento 2: %s\n", argumento2);
     }
   }
 /*LISTA DE COMANDOS DISPONIBLES
@@ -167,11 +176,12 @@ int ComprobarComando(char *strcomando, char *orden,
             numeroComando = 5;
          }
          else if (strcmp(orden, "remove") == 0) {
-            RemoveFile(directorio, ext_blq_inodos, ext_bytemaps, psup, argumento1);
+            Borrar(directorio, ext_blq_inodos, ext_bytemaps, psup, argumento1);
             numeroComando = 6;
          }
          else if (strcmp(orden, "copy") == 0) {
-            CopyFile(directorio, ext_blq_inodos, ext_bytemaps, psup, memdatos, argumento1, argumento2);
+            //Copiar(directorio, ext_blq_inodos, bmap_inodos, bmap_bloques, argumento1, argumento2, );
+            Copiar(directorio,ext_blq_inodos, ext_bytemaps, psup, memdatos, argumento1, argumento2, fich);
             numeroComando = 7;
          }
          else if (strcmp(orden, "salir\n") == 0) {
@@ -338,7 +348,7 @@ void RenameFile(EXT_ENTRADA_DIR *directorio, const char *nombre_actual, const ch
     }
 }
 
-void RemoveFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_archivo) {
+void Borrar(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_archivo) {
     for (int i = 0; i < 20; i++) {
         if (strcmp(directorio[i].dir_nfich, nombre_archivo) == 0) {
             unsigned short int inodo_num = directorio[i].dir_inodo;
@@ -367,29 +377,30 @@ void RemoveFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned 
     printf("Error: Archivo no encontrado.\n");
 }
 
-void CopyFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_origen, const char *nombre_destino) {
+/*int Copiar(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned char *bmap_inodos, unsigned char *bmap_bloques, const char *nombre_origen, const char *nombre_destino) {
     int origen_idx = -1, destino_idx = -1;
 
-    // Buscar el archivo origen
+    // Buscamos el archivo de origen para copiar
     for (int i = 0; i < 20; i++) {
         if (strcmp(directorio[i].dir_nfich, nombre_origen) == 0) {
             origen_idx = i;
             break;
         }
     }
+    // Si no existe, mostramos por pantalla el error.
     if (origen_idx == -1) {
         printf("Error: Archivo origen no encontrado.\n");
         return;
     }
 
-    // Verificar si el destino ya existe
+    // Verificamos la existencia del archivo
     for (int i = 0; i < 20; i++) {
         if (strcmp(directorio[i].dir_nfich, nombre_destino) == 0) {
             printf("Error: Archivo destino ya existe.\n");
             return;
         }
         if (directorio[i].dir_nfich[0] == '\0' && destino_idx == -1) {
-            destino_idx = i; // Guardar la primera entrada vacía
+            destino_idx = i; // Guardamos la primera entrada vacía
         }
     }
     if (destino_idx == -1) {
@@ -397,7 +408,7 @@ void CopyFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned ch
         return;
     }
 
-    // Buscar el primer inodo libre
+    // Buscamos el primer inodo libre
     int inodo_libre = -1;
     for (int i = 0; i < MAX_INODOS; i++) {
         if (bmap_inodos[i] == 0) {
@@ -410,12 +421,12 @@ void CopyFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned ch
         return;
     }
 
-    // Copiar contenido del archivo
+    // Copiamos el contenido del archivo
     EXT_SIMPLE_INODE *inodo_origen = &inodos[directorio[origen_idx].dir_inodo];
     EXT_SIMPLE_INODE *inodo_destino = &inodos[inodo_libre];
     *inodo_destino = *inodo_origen;
 
-    // Asignar nuevos bloques para la copia
+    // Asignamos nuevos bloques para realizar la copia
     for (int i = 0; i < 7 && inodo_origen->i_nbloque[i] != 0xFFFF; i++) {
         for (int j = 0; j < MAX_BLOQUES_PARTICION; j++) {
             if (bmap_bloques[j] == 0) {
@@ -435,4 +446,11 @@ void CopyFile(EXT_ENTRADA_DIR *directorio, EXT_SIMPLE_INODE *inodos, unsigned ch
     directorio[destino_idx].dir_inodo = inodo_libre;
 
     printf("Archivo copiado exitosamente.\n");
-}
+}*/
+
+int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
+           EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
+           EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
+            
+           }
+
