@@ -160,23 +160,28 @@ int ComprobarComando(char *strcomando, char *orden,
          }
          else if(strcmp(orden,"rename")==0){
             RenameFile(directorio, argumento1, argumento2);
-            numeroComando = 4;
+            numeroComando = 4;  
          }
          else if(strcmp(orden,"imprimir")==0){
             Imprimir(directorio, ext_blq_inodos, memdatos, argumento1);
             numeroComando = 5;
          }
-         else if(strcmp(orden,"remove")==0){
-            RemoveFile(directorio, ext_blq_inodos, bmap_inodos, bmap_bloques, argumento1);
+         else if (strcmp(orden, "remove") == 0) {
+            RemoveFile(directorio, ext_blq_inodos, ext_bytemaps, psup, argumento1, fent);
             numeroComando = 6;
          }
-         else if(strcmp(orden,"copy")==0){
-            CopyFile(directorio, ext_blq_inodos, bmap_inodos, bmap_bloques, argumento1, argumento2);
+         else if (strcmp(orden, "copy") == 0) {
+            CopyFile(directorio, ext_blq_inodos, ext_bytemaps, psup, memdatos, argumento1, argumento2, fent);
             numeroComando = 7;
          }
-         else if(strcmp(orden,"salir\n")==0){
+         else if (strcmp(orden, "salir\n") == 0) {
+            if (grabardatos) {
+                GrabarDatos(memdatos, fent);
+                grabardatos = 0;
+            } 
+            fclose(fent);
             numeroComando = 8;
-         }
+        }
          else{
             printf("ERROR. Comando ilegal [bytemaps, copy, dir, info, imprimir, rename, remove, salir]\n");
          }
